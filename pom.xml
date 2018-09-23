@@ -54,7 +54,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.opennms.container/springsource-dm-server -->
+        <dependency>
+            <groupId>org.opennms.container</groupId>
+            <artifactId>springsource-dm-server</artifactId>
+            <version>3.9.6.RELEASE</version>
+            <type>pom</type>
+        </dependency>
+
     </dependencies>
+
+
 
     <build>
         <plugins>
@@ -64,6 +75,7 @@
             </plugin>
         </plugins>
     </build>
+
 
 
 </project>
