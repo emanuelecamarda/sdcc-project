@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -58,5 +60,13 @@ public class NodeRest {
     public ResponseEntity<List<Node>> findAllNode() {
         List<Node> nodes = nodeController.findAllNode();
         return new ResponseEntity<>(nodes, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "registration", method = RequestMethod.POST)
+    public ResponseEntity<Node> registerNode(HttpServletRequest request) {
+        System.out.println(request.getRemoteAddr());
+        Node nodeToRegister = new Node(request.getRemoteAddr());
+        Node newNode = nodeController.createNode(nodeToRegister);
+        return new ResponseEntity<>(newNode, HttpStatus.CREATED);
     }
 }
