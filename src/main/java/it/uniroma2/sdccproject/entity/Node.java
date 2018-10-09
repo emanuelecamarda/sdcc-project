@@ -27,4 +27,12 @@ public class Node {
         if(node.ipAddr !=null)
             this.ipAddr = node.ipAddr;
     }
+
+    public String getIpAddr() {
+        return ipAddr;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

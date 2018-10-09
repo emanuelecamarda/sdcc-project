@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -57,7 +58,7 @@ public class NodeRest {
     }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
-    public ResponseEntity<List<Node>> findAllNode() {
+    public ResponseEntity<List<Node>> findAllNode() throws IOException {
         List<Node> nodes = nodeController.findAllNode();
         return new ResponseEntity<>(nodes, HttpStatus.OK);
     }
@@ -68,5 +69,23 @@ public class NodeRest {
         Node nodeToRegister = new Node(request.getRemoteAddr());
         Node newNode = nodeController.createNode(nodeToRegister);
         return new ResponseEntity<>(newNode, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(path = "random", method = RequestMethod.GET)
+    public ResponseEntity<Node> findNodeRandom() throws IOException {
+        Node node = nodeController.findNodeRandom();
+        if(node == null)
+            return new ResponseEntity<>(node, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(node, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "distance", method = RequestMethod.GET)
+    public ResponseEntity<Node> findNodeByDistance(HttpServletRequest request) throws IOException {
+        System.out.println("clientIP =" + request.getRemoteAddr());
+        String clientIp = request.getRemoteAddr();
+        Node node = nodeController.findNodeByDistance(clientIp);
+        if (node == null)
+            return new ResponseEntity<>(node, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(node, HttpStatus.OK);
     }
 }
