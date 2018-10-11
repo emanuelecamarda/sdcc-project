@@ -3,6 +3,7 @@ package it.uniroma2.sdccproject.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 
@@ -17,6 +18,7 @@ public class Node {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "node_id")
     private Long id;
+    @NaturalId
     private String ipAddr;
 
     public Node(String ipAddr) {

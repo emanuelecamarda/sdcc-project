@@ -29,6 +29,9 @@ public class NodeController {
 
     @Transactional
     public Node createNode(@NotNull Node node) {
+        Node node2 = nodeDao.getByIpAddrEquals(node.getIpAddr());
+        if (node2 != null)
+            return node2;
         return nodeDao.save(node);
     }
 
@@ -57,9 +60,10 @@ public class NodeController {
         for (int i = 0; i < nodes.size(); i++) {
             InetAddress inet = InetAddress.getByName(nodes.get(i).getIpAddr());
             if (!inet.isReachable(5000)) {
+                System.out.println("Node: " + nodes.get(i).getIpAddr() + " not reachable. It'll be removed from " +
+                        "the list");
                 deleteNode(nodes.get(i).getId());
                 nodes.remove(i);
-                System.out.println("nodes =" + nodes);
             }
         }
         if (nodes.isEmpty())
@@ -78,15 +82,16 @@ public class NodeController {
                 return null;
             i = (int) Math.floor(Math.random() * nodes.size());
 
-            System.out.println("Random index = " + i);
+            System.out.println("Sent to client node: " + nodes.get(i).getIpAddr());
 
             InetAddress inet = InetAddress.getByName(nodes.get(i).getIpAddr());
             if (inet.isReachable(5000))
                 find = true;
             else {
+                System.out.println("Node: " + nodes.get(i).getIpAddr() + "not reachable. It'll be removed from " +
+                        "the list");
                 deleteNode(nodes.get(i).getId());
                 nodes.remove(i);
-                System.out.println("nodes =" + nodes);
             }
         }
         return nodes.get(i);
@@ -100,7 +105,7 @@ public class NodeController {
         int bestNode = 0;
         LookupService lookupService = new LookupService("/home/ec2-user/data/GeoLiteCity.dat");
         Location locationClient = lookupService.getLocation(clientIp);
-        System.out.println("locationClient = " + locationClient.city);
+        System.out.println("Location of the client: " + locationClient.city);
         Location locationNode;
         boolean find = false;
         while (!find) {
@@ -114,15 +119,16 @@ public class NodeController {
                     bestNode = i;
                 }
             }
-            System.out.println("Best node index = " + bestNode);
+            System.out.println("Sent to client nearest node: " + nodes.get(bestNode).getIpAddr());
 
             InetAddress inet = InetAddress.getByName(nodes.get(bestNode).getIpAddr());
             if (inet.isReachable(5000))
                 find = true;
             else {
+                System.out.println("Node: " + nodes.get(bestNode).getIpAddr() + "not reachable. It'll be removed " +
+                        "from the list");
                 deleteNode(nodes.get(bestNode).getId());
                 nodes.remove(bestNode);
-                System.out.println("nodes =" + nodes);
             }
         }
         return nodes.get(bestNode);

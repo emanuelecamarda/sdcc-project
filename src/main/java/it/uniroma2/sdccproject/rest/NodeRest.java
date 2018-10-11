@@ -65,9 +65,10 @@ public class NodeRest {
 
     @RequestMapping(path = "registration", method = RequestMethod.POST)
     public ResponseEntity<Node> registerNode(HttpServletRequest request) {
-        System.out.println(request.getRemoteAddr());
+        System.out.println("Registering node: " + request.getRemoteAddr());
         Node nodeToRegister = new Node(request.getRemoteAddr());
         Node newNode = nodeController.createNode(nodeToRegister);
+        System.out.println("Registered");
         return new ResponseEntity<>(newNode, HttpStatus.CREATED);
     }
 
@@ -81,7 +82,6 @@ public class NodeRest {
 
     @RequestMapping(path = "distance", method = RequestMethod.GET)
     public ResponseEntity<Node> findNodeByDistance(HttpServletRequest request) throws IOException {
-        System.out.println("clientIP =" + request.getRemoteAddr());
         String clientIp = request.getRemoteAddr();
         Node node = nodeController.findNodeByDistance(clientIp);
         if (node == null)
