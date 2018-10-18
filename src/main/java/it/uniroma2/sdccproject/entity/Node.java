@@ -12,6 +12,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "nodes")
+/* This class rappresents a Fog node */
 public class Node {
 
     @Id
@@ -19,6 +20,7 @@ public class Node {
     @Column(name = "node_id")
     private Long id;
     @NaturalId
+    // The public Ip address of the node
     private String ipAddr;
 
     public Node(String ipAddr) {

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface NodeDao extends JpaRepository<Node,Long> {
 
+    // Query to find a node in DB by ip address
     Node getByIpAddrEquals(String ipAddr);
 
 }

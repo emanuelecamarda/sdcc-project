@@ -21,12 +21,23 @@ public class NodeController {
     @Autowired
     private NodeDao nodeDao;
 
+    /**
+     * Find a node in DB with specific id.
+     * @param id of searched node
+     * @return the searched node
+     * @throws NotFoundEntityException if node was not found
+     */
     public Node findNode(Long id) throws NotFoundEntityException {
         if (!nodeDao.existsById(id))
             throw new NotFoundEntityException();
         return nodeDao.getOne(id);
     }
 
+    /**
+     * Create a new node in DB. If already exists a node with this ip address, return that node.
+     * @param node to create
+     * @return node created
+     */
     @Transactional
     public Node createNode(@NotNull Node node) {
         Node node2 = nodeDao.getByIpAddrEquals(node.getIpAddr());
@@ -35,6 +46,13 @@ public class NodeController {
         return nodeDao.save(node);
     }
 
+    /**
+     * Change the information of a node in DB.
+     * @param id of node
+     * @param node that contained the new information to update
+     * @return node saved
+     * @throws NotFoundEntityException if node was not found
+     */
     @Transactional
     public Node updateNode(@NotNull Long id, @NotNull Node node) throws NotFoundEntityException {
         Node nodeToUpdate = nodeDao.getOne(id);
@@ -45,6 +63,11 @@ public class NodeController {
         return nodeDao.save(nodeToUpdate);
     }
 
+    /**
+     * Delete a node in DB
+     * @param id of node to delete
+     * @return true if delete has been done, false otherwise
+     */
     @Transactional
     public boolean deleteNode(@NotNull Long id) {
         if (!nodeDao.existsById(id)) {
@@ -55,8 +78,15 @@ public class NodeController {
         return true;
     }
 
+    /**
+     * Find all node in DB, checking if all are reachable. If a node is not reachable, delete it from DB and from the
+     * list.
+     * @return a list contains all node reachable
+     * @throws IOException
+     */
     public List<Node> findAllNode() throws IOException {
         List<Node> nodes = nodeDao.findAll();
+        // check if all node are reachable
         for (int i = 0; i < nodes.size(); i++) {
             InetAddress inet = InetAddress.getByName(nodes.get(i).getIpAddr());
             if (!inet.isReachable(5000)) {
@@ -71,6 +101,11 @@ public class NodeController {
         return  nodeDao.findAll();
     }
 
+    /**
+     * Select a reachable node randomly.
+     * @return a reachable node
+     * @throws IOException
+     */
     public Node findNodeRandom() throws IOException {
         List<Node> nodes = nodeDao.findAll();
         if (nodes.isEmpty())
@@ -97,17 +132,25 @@ public class NodeController {
         return nodes.get(i);
     }
 
+    /**
+     * Select the closest node to client from list of reachable ones.
+     * @param clientIp ip address of client
+     * @return the closest node
+     * @throws IOException
+     */
     public Node findNodeByDistance(@NotNull String clientIp) throws IOException {
         List<Node> nodes = nodeDao.findAll();
         if (nodes.isEmpty())
             return null;
         double bestDistance = -1, distance;
         int bestNode = 0;
+        // use file GeoLiteCity.dat to calculate location of node from ip address
         LookupService lookupService = new LookupService("/home/ec2-user/data/GeoLiteCity.dat");
         Location locationClient = lookupService.getLocation(clientIp);
         System.out.println("Location of the client: " + locationClient.city);
         Location locationNode;
         boolean find = false;
+        // Calculate closest node to client
         while (!find) {
             if (nodes.isEmpty())
                 return null;
